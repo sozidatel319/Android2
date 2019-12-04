@@ -20,7 +20,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       
+        setContentView(R.layout.activity_main);
+        temp = findViewById(R.id.temp);
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
+        sensorTemp = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
     }
 
     SensorEventListener listenerTemp = new SensorEventListener() {
