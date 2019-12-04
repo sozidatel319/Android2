@@ -13,18 +13,20 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private SensorManager sensorManager;
-    private List<Sensor> sensors;
     private TextView temp;
+    private TextView humidity;
     private Sensor sensorTemp;
+    private Sensor sensorHumidity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         temp = findViewById(R.id.temp);
+        humidity = findViewById(R.id.humidity);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        sensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
         sensorTemp = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+        sensorHumidity = sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
     }
 
     SensorEventListener listenerTemp = new SensorEventListener() {
@@ -35,19 +37,44 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onSensorChanged(SensorEvent event) {
-            temp.setText(String.valueOf(event.values[0]));
+            temp.setText(new StringBuilder().append("Температура").append(" ").append(event.values[0]));
         }
     };
 
+    SensorEventListener listenerHumidity = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            humidity.setText(new StringBuilder().append("Влажность").append(" ").append(event.values[0]));
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };
+
+
     @Override
     protected void onResume() {
-        sensorManager.registerListener(listenerTemp,sensorTemp,SensorManager.SENSOR_DELAY_NORMAL);
+        if (listenerTemp == null) {
+            sensorManager.registerListener(listenerTemp, sensorTemp, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+        if (listenerHumidity == null) {
+            sensorManager.registerListener(listenerHumidity, sensorHumidity, SensorManager.SENSOR_DELAY_NORMAL);
+        }
         super.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        sensorManager.unregisterListener(listenerTemp,sensorTemp);
+        if (listenerTemp != null) {
+            sensorManager.unregisterListener(listenerTemp, sensorTemp);
+            listenerTemp = null;
+        }
+        if (listenerHumidity != null) {
+            sensorManager.unregisterListener(listenerHumidity, sensorHumidity);
+            listenerHumidity = null;
+        }
     }
 }
